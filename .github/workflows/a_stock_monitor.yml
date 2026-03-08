@@ -1,0 +1,31 @@
+name: A股9:25集合竞价监控
+
+on:
+  schedule:
+    - cron: '25 1 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout 代码
+        uses: actions/checkout@v4
+
+      - name: 设置Python环境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: 安装依赖
+        run: |
+          pip install akshare pandas requests
+
+      - name: 执行监控脚本
+        env:
+          PUSH_KEY: ${{ secrets.PUSH_KEY }}
+          PUSH_TYPE: ${{ secrets.PUSH_TYPE || 'bark' }}
+        run: |
+          python a_stock_monitor.py
